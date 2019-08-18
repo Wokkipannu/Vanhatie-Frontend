@@ -1,4 +1,5 @@
-# frontend
+# Vanha tie Frontend
+Frontend for a WoW Guild DKP App. Requires [Vanha tie Backend](https://github.com/Wokkipannu/Vanhatie-Backend) to work properly.
 
 ## Project setup
 ```

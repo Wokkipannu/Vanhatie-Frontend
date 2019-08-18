@@ -5,6 +5,7 @@
         <b-navbar-nav>
           <router-link to="/" tag="b-nav-item">Pelaajat</router-link>
           <router-link to="/login" tag="b-nav-item" v-if="!isLogged">Kirjaudu sisään</router-link>
+          <router-link to="/users" tag="b-nav-item" v-if="isLogged">Käyttäjät</router-link>
           <b-nav-item v-if="isLogged" v-on:click="logout">Kirjaudu ulos</b-nav-item>
         </b-navbar-nav>
       </b-container>

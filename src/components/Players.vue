@@ -19,12 +19,17 @@
         <b-spinner class="align-middle"></b-spinner>
         <strong class="ml-2">Loading...</strong>
       </div>
+      <template slot="[name]" slot-scope="player" v-if="isLogged">
+        <b-form-input type="text" placeholder="Pelaajan nimi" v-model="player.item.name"></b-form-input>
+      </template>
+      <template slot="[dkp]" slot-scope="player" v-if="isLogged">
+        <b-form-input type="number" placeholder="DKP" v-model="player.item.dkp"></b-form-input>
+      </template>
       <template slot="[actions]" slot-scope="player">
         <b-input-group>
-          <b-form-input type="number" placeholder="Määrä" v-model="player.item.amount"></b-form-input>
           <b-form-input type="text" placeholder="Syy" v-model="player.item.reason"></b-form-input>
           <b-input-group-append>
-            <b-button variant="info" v-on:click="update(player.item)" :disabled="player.item.amount ? false : true">Give/Take</b-button>
+            <b-button variant="info" v-on:click="update(player.item)">Tallenna muutokset</b-button>
           </b-input-group-append>
         </b-input-group>
       </template>
@@ -56,6 +61,7 @@ export default {
         }
       },
       players: [],
+      playersCopy: [],
       options: [],
       search: '',
       error: null,
@@ -65,6 +71,7 @@ export default {
   sockets: {
     newPlayer(player) {
       this.players.push(player);
+      this.playersCopy.push(JSON.parse(JSON.stringify(player)));
     },
     updatePlayer(player) {
       this.players.find(p => p._id === player._id).dkp = player.dkp;
@@ -79,27 +86,32 @@ export default {
     this.loading = true;
     this.$http.get(`${process.env.VUE_APP_API_ENDPOINT}/api/v1/players`).then(res => {
       this.players = res.data.data;
+      this.playersCopy = JSON.parse(JSON.stringify(res.data.data));
       this.options = res.data.data.map(player => player.name);
       this.loading = false;
     });
   },
   methods: {
     update(player) {
-      if (!player.amount) return this.error = 'DKP arvo ei voi olla tyhjä';
-
       this.loading = true;
-      player.dkp = parseInt(player.dkp);
-      player.dkp += parseInt(player.amount);
 
+      let copyPlayer = this.playersCopy.find(p => p._id === player._id);
+
+      let content = [];
+      if (copyPlayer.name !== player.name) content.push(`> Pelaajan **${copyPlayer.name}** nimi muuetttiin, uusi nimi **${player.name}**`);
+      if (copyPlayer.dkp !== player.dkp) content.push(`> Pelaajan **${player.name}** DKP muutettiin **${player.dkp - copyPlayer.dkp}** (Nyt ${player.dkp})`);
+      if (player.reason) content.push(`> **Syy:** ${player.reason}`);
+      
       const payload = {
-        content: `**${player.amount}** DKP pelaajalle **${player.name}** (Nyt: ${player.dkp} DKP). **Syy:** ${player.reason}`
+        content: content.join('\n')
       };
 
-      delete player.amount;
       delete player.reason;
 
       this.$http.put(`${process.env.VUE_APP_API_ENDPOINT}/api/v1/players/${player._id}?token=${localStorage.token}`, player).then(() => {
         this.$http.post(`${process.env.VUE_APP_WEBHOOK}`, JSON.stringify(payload));
+        copyPlayer.dkp = player.dkp;
+        copyPlayer.name = player.name;
         this.loading = false;
       })
       .catch(error => {
