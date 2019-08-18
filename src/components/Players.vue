@@ -141,7 +141,7 @@ export default {
       newUser: '',
       races: ['N/A', 'Orc', 'Tauren', 'Troll', 'Undead'],
       classes: ['N/A', 'Druid', 'Hunter', 'Mage', 'Priest', 'Rogue', 'Shaman', 'Warlock', 'Warrior'],
-      professions: ['N/A', 'Blacksmith', 'Engineering', 'Herbalism', 'Mining', 'Leatherworking', 'Tailoring', 'Enchanting', 'Alchemy', 'Skinning'],
+      professions: ['N/A', 'Blacksmithing', 'Engineering', 'Herbalism', 'Mining', 'Leatherworking', 'Tailoring', 'Enchanting', 'Alchemy', 'Skinning'],
       modifying: false,
       perPage: 10,
       currentPage: 1,
