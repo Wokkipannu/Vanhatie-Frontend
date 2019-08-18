@@ -11,7 +11,7 @@
       </b-col>
       <b-col>
         <label for="search-for-player">Hae</label>
-        <b-form-input list="input-list" id="search-for-player" v-model.lazy="search" placeholder="Pelaajan nimi"></b-form-input>
+        <b-form-input list="input-list" id="search-for-player" v-model.lazy="search" placeholder="Pelaaja/Race/Class/Spec/Profession"></b-form-input>
         <b-form-datalist id="input-list" :options="options"></b-form-datalist>
       </b-col>
     </b-row>
@@ -163,6 +163,9 @@ export default {
       this.players = res.data.data;
       this.playersCopy = JSON.parse(JSON.stringify(res.data.data));
       this.options = res.data.data.map(player => player.name);
+      this.options.push(...this.races);
+      this.options.push(...this.classes);
+      this.options.push(...this.professions);
       this.loading = false;
     });
   },
@@ -236,7 +239,14 @@ export default {
   },
   computed: {
     filteredPlayers() {
-      return this.players.filter(player => player.name.toLowerCase().includes(this.search.toLowerCase()));
+      return this.players.filter(player => {
+        return player.name && player.name.toLowerCase().includes(this.search.toLowerCase()) ||
+               player.race && player.race.toLowerCase().includes(this.search.toLowerCase()) ||
+               player.class && player.class.toLowerCase().includes(this.search.toLowerCase()) ||
+               player.prof1 && player.prof1.toLowerCase().includes(this.search.toLowerCase()) ||
+               player.prof2 && player.prof2.toLowerCase().includes(this.search.toLowerCase()) ||
+               player.spec && player.spec.toLowerCase().includes(this.search.toLowerCase());
+      });
     },
     isLogged() {
       if (localStorage.token) return true;
