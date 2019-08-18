@@ -1,25 +1,33 @@
 <template>
-  <b-container :fluid="modifying">
+  <b-container :fluid="modifying" class="mt-5">
     <b-row>
-      <b-col>
+      <b-col md="2">
         <h4 v-on:click="reset" id="reset-search-button" class="d-inline">Pelaajat</h4>
       </b-col>
-      <b-col v-if="isLogged">
+      <b-col v-if="isLogged" md="2">
         <b-form-checkbox v-model="modifying" name="check-button" switch>
           Muokkaus tila
         </b-form-checkbox>
       </b-col>
-      <b-col>
-        <label for="search-for-player">Hae</label>
-        <b-form-input list="input-list" id="search-for-player" v-model.lazy="search" placeholder="Pelaaja/Race/Class/Spec/Profession"></b-form-input>
-        <b-form-datalist id="input-list" :options="options"></b-form-datalist>
+      <b-col :md="isLogged ? '8' : '10'">
+        <b-row>
+          <b-col>
+            <label for="search-for-player">Hae</label>
+            <b-form-input list="input-list" id="search-for-player" v-model.lazy="search" placeholder="Pelaaja/Race/Class/Spec/Profession"></b-form-input>
+            <b-form-datalist id="input-list" :options="options"></b-form-datalist>
+          </b-col>
+          <b-col>
+            <label for="players-per-page">Pelaajaa per sivu</label>
+            <b-form-select id="players-per-page" v-model="perPage" :options="perPageOptions"/>
+          </b-col>
+        </b-row>
       </b-col>
     </b-row>
     <hr/>
     <b-alert v-if="error" show variant="warning">
       {{ error }}
     </b-alert>
-    <b-table :items="filteredPlayers" :busy="loading" :fields="fields" striped id="players-table">
+    <b-table :items="filteredPlayers" :busy="loading" :fields="fields" striped id="players-table" :per-page="perPage" :current-page="currentPage">
       <div slot="table-busy" class="text-center text-primary my-2">
         <b-spinner class="align-middle"></b-spinner>
         <strong class="ml-2">Loading...</strong>
@@ -66,6 +74,8 @@
         </b-input-group>
       </template>
     </b-table>
+
+    <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="players-table" class="d-flex justify-content-center align-items-center"></b-pagination>
 
     <b-input-group class="w-25" v-if="isLogged">
       <b-form-input type="text" placeholder="Nimi" v-model="newUser"></b-form-input>
@@ -132,7 +142,10 @@ export default {
       races: ['N/A', 'Orc', 'Tauren', 'Troll', 'Undead'],
       classes: ['N/A', 'Druid', 'Hunter', 'Mage', 'Priest', 'Rogue', 'Shaman', 'Warlock', 'Warrior'],
       professions: ['N/A', 'Blacksmith', 'Engineering', 'Herbalism', 'Mining', 'Leatherworking', 'Tailoring', 'Enchanting', 'Alchemy', 'Skinning'],
-      modifying: false
+      modifying: false,
+      perPage: 10,
+      currentPage: 1,
+      perPageOptions: [10,20,30,40,50,60,70,80,90,100]
     }
   },
   sockets: {
@@ -259,6 +272,9 @@ export default {
     isLogged() {
       if (localStorage.token) return true;
       else return false;
+    },
+    rows() {
+      return this.filteredPlayers.length;
     }
   }
 }
