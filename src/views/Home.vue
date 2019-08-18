@@ -1,12 +1,6 @@
 <template>
   <div>
-    <b-container class="mt-5" v-if="!isLogged">
-      <Players/>
-    </b-container>
-
-    <b-container fluid class="mt-5" v-if="isLogged">
-      <Players/>
-    </b-container>
+    <Players/>
   </div>
 </template>
 

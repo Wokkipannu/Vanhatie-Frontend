@@ -1,8 +1,13 @@
 <template>
-  <div>
+  <b-container :fluid="modifying">
     <b-row>
       <b-col>
         <h4>Pelaajat</h4>
+      </b-col>
+      <b-col v-if="isLogged">
+        <b-form-checkbox v-model="modifying" name="check-button" switch>
+          Muokkaus tila
+        </b-form-checkbox>
       </b-col>
       <b-col>
         <label for="search-for-player">Hae</label>
@@ -14,45 +19,45 @@
     <b-alert v-if="error" show variant="warning">
       {{ error }}
     </b-alert>
-    <b-table :items="filteredPlayers" :busy="loading" :fields="fields">
+    <b-table :items="filteredPlayers" :busy="loading" :fields="fields" striped id="players-table">
       <div slot="table-busy" class="text-center text-primary my-2">
         <b-spinner class="align-middle"></b-spinner>
         <strong class="ml-2">Loading...</strong>
       </div>
 
-      <template slot="[name]" slot-scope="player" v-if="isLogged">
+      <template slot="[name]" slot-scope="player" v-if="modifying">
         <b-form-input type="text" placeholder="Pelaajan nimi" v-model="player.item.name"></b-form-input>
       </template>
 
-      <template slot="[dkp]" slot-scope="player" v-if="isLogged">
+      <template slot="[dkp]" slot-scope="player" v-if="modifying">
         <b-form-input type="number" placeholder="DKP" v-model="player.item.dkp"></b-form-input>
       </template>
 
       <template slot="[race]" slot-scope="player">
-        <b-form-select v-model="player.item.race" :options="races" v-if="isLogged"></b-form-select>
-        <div v-if="!isLogged"><b-img :src="getRaceIcon(player.item.race)"/> {{ player.item.race }}</div>
+        <b-form-select v-model="player.item.race" :options="races" v-if="modifying"></b-form-select>
+        <div v-if="!modifying"><b-img :src="getRaceIcon(player.item.race)"/> {{ player.item.race }}</div>
       </template>
 
       <template slot="[class]" slot-scope="player">
-        <b-form-select v-model="player.item.class" :options="classes" v-if="isLogged"></b-form-select>
-        <div v-if="!isLogged"><b-img :src="getClassIcon(player.item.class)"/> {{ player.item.class }}</div>
+        <b-form-select v-model="player.item.class" :options="classes" v-if="modifying"></b-form-select>
+        <div v-if="!modifying"><b-img :src="getClassIcon(player.item.class)"/> {{ player.item.class }}</div>
       </template>
 
-      <template slot="[spec]" slot-scope="player" v-if="isLogged">
+      <template slot="[spec]" slot-scope="player" v-if="modifying">
         <b-form-input type="text" placeholder="Spec" v-model="player.item.spec"></b-form-input>
       </template>
 
       <template slot="[prof1]" slot-scope="player">
-        <b-form-select v-model="player.item.prof1" :options="professions" v-if="isLogged"></b-form-select>
-        <div v-if="!isLogged"><b-img :src="getProfessionIcon(player.item.prof1)"/> {{ player.item.prof1 }}</div>
+        <b-form-select v-model="player.item.prof1" :options="professions" v-if="modifying"></b-form-select>
+        <div v-if="!modifying"><b-img :src="getProfessionIcon(player.item.prof1)"/> {{ player.item.prof1 }}</div>
       </template>
 
       <template slot="[prof2]" slot-scope="player">
-        <b-form-select v-model="player.item.prof2" :options="professions" v-if="isLogged"></b-form-select>
-        <div v-if="!isLogged"><b-img :src="getProfessionIcon(player.item.prof2)"/> {{ player.item.prof2 }}</div>
+        <b-form-select v-model="player.item.prof2" :options="professions" v-if="modifying"></b-form-select>
+        <div v-if="!modifying"><b-img :src="getProfessionIcon(player.item.prof2)"/> {{ player.item.prof2 }}</div>
       </template>
 
-      <template slot="[actions]" slot-scope="player">
+      <template slot="[actions]" slot-scope="player" v-if="modifying">
         <b-input-group>
           <b-form-input type="text" placeholder="Syy" v-model="player.item.reason"></b-form-input>
           <b-input-group-append>
@@ -68,8 +73,15 @@
         <b-button variant="success" v-on:click="addPlayer">Lisää</b-button>
       </b-input-group-append>
     </b-input-group>
-  </div>
+  </b-container>
 </template>
+
+<style>
+.table-light {
+  background-color: #c52d00;
+  color: #FFF;
+}
+</style>
 
 <script>
 export default {
@@ -104,6 +116,7 @@ export default {
         },
         dkp: {
           label: 'DKP',
+          variant: 'light',
           sortable: true
         }
       },
@@ -115,7 +128,8 @@ export default {
       newUser: '',
       races: ['N/A', 'Orc', 'Tauren', 'Troll', 'Undead'],
       classes: ['N/A', 'Druid', 'Hunter', 'Mage', 'Priest', 'Rogue', 'Shaman', 'Warlock', 'Warrior'],
-      professions: ['N/A', 'Blacksmithing', 'Engineering', 'Herbalism', 'Mining', 'Leatherworking', 'Tailoring', 'Enchanting', 'Alchemy', 'Skinning']
+      professions: ['N/A', 'Blacksmith', 'Engineering', 'Herbalism', 'Mining', 'Leatherworking', 'Tailoring', 'Enchanting', 'Alchemy', 'Skinning'],
+      modifying: false
     }
   },
   sockets: {
@@ -128,11 +142,19 @@ export default {
       Object.keys(player).forEach(key => {
         p[key] = player[key];
       });
+      this.$root.$emit('bv::refresh::table', 'players-table');
     }
   },
-  beforeMount() {
-    if (localStorage.token) {
-      this.fields.actions = { label: 'Actions', sortable: false }
+  watch: {
+    modifying(newVal) {
+      if (!newVal) {
+        delete this.fields.actions;
+        this.$root.$emit('bv::refresh::table', 'players-table');
+      }
+      else {
+        this.fields.actions = { label: 'Actions', sortable: false };
+        this.$root.$emit('bv::refresh::table', 'players-table');
+      }
     }
   },
   created() {
