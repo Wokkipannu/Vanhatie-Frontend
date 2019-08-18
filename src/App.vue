@@ -24,6 +24,20 @@ export default {
       window.location.reload();
     }
   },
+  created() {
+    if (localStorage.token) {
+      this.$http.post(`${process.env.VUE_APP_API_ENDPOINT}/api/v1/users/token`, { token: localStorage.token }).then(res => {
+        if (res.data.status !== 'success') {
+          localStorage.removeItem('token');
+          window.location.reload();
+        }
+      })
+      .catch(error => {
+        localStorage.removeItem('token');
+        window.location.reload();
+      });
+    }
+  },
   computed: {
     isLogged() {
       if (localStorage.token) return true;
