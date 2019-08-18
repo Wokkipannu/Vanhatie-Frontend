@@ -32,7 +32,7 @@ export default {
           window.location.reload();
         }
       })
-      .catch(error => {
+      .catch(() => {
         localStorage.removeItem('token');
         window.location.reload();
       });
