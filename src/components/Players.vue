@@ -136,6 +136,7 @@ export default {
     newPlayer(player) {
       this.players.push(player);
       this.playersCopy.push(JSON.parse(JSON.stringify(player)));
+      this.options.push(player.name);
     },
     updatePlayer(player) {
       let p = this.players.find(p => p._id === player._id);
