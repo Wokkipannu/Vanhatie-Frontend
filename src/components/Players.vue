@@ -2,7 +2,7 @@
   <b-container :fluid="modifying">
     <b-row>
       <b-col>
-        <h4>Pelaajat</h4>
+        <h4 v-on:click="reset" id="reset-search-button" class="d-inline">Pelaajat</h4>
       </b-col>
       <b-col v-if="isLogged">
         <b-form-checkbox v-model="modifying" name="check-button" switch>
@@ -80,6 +80,9 @@
 .table-light {
   background-color: #c52d00;
   color: #FFF;
+}
+#reset-search-button {
+  cursor: pointer;
 }
 </style>
 
@@ -236,6 +239,10 @@ export default {
     getProfessionIcon(val) {
       if (this.professions.includes(val) && val !== 'N/A') return require(`../assets/profession_${val.toLowerCase()}.png`);
       else return require('../assets/na.png');
+    },
+
+    reset() {
+      this.search = '';
     }
   },
   computed: {
