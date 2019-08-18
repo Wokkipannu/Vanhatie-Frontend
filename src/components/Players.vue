@@ -38,6 +38,20 @@
         <div v-if="!isLogged"><b-img :src="getClassIcon(player.item.class)"/> {{ player.item.class }}</div>
       </template>
 
+      <template slot="[spec]" slot-scope="player" v-if="isLogged">
+        <b-form-input type="text" placeholder="Spec" v-model="player.item.spec"></b-form-input>
+      </template>
+
+      <template slot="[prof1]" slot-scope="player">
+        <b-form-select v-model="player.item.prof1" :options="professions" v-if="isLogged"></b-form-select>
+        <div v-if="!isLogged"><b-img :src="getProfessionIcon(player.item.prof1)"/> {{ player.item.prof1 }}</div>
+      </template>
+
+      <template slot="[prof2]" slot-scope="player">
+        <b-form-select v-model="player.item.prof2" :options="professions" v-if="isLogged"></b-form-select>
+        <div v-if="!isLogged"><b-img :src="getProfessionIcon(player.item.prof2)"/> {{ player.item.prof2 }}</div>
+      </template>
+
       <template slot="[actions]" slot-scope="player">
         <b-input-group>
           <b-form-input type="text" placeholder="Syy" v-model="player.item.reason"></b-form-input>
@@ -76,6 +90,18 @@ export default {
           label: 'Class',
           sortable: true
         },
+        spec: {
+          label: 'Spec',
+          sortable: true
+        },
+        prof1: {
+          label: 'Profession 1',
+          sortable: true
+        },
+        prof2: {
+          label: 'Profession 2',
+          sortable: true
+        },
         dkp: {
           label: 'DKP',
           sortable: true
@@ -88,7 +114,8 @@ export default {
       error: null,
       newUser: '',
       races: ['N/A', 'Orc', 'Tauren', 'Troll', 'Undead'],
-      classes: ['N/A', 'Druid', 'Hunter', 'Mage', 'Priest', 'Rogue', 'Shaman', 'Warlock', 'Warrior']
+      classes: ['N/A', 'Druid', 'Hunter', 'Mage', 'Priest', 'Rogue', 'Shaman', 'Warlock', 'Warrior'],
+      professions: ['N/A', 'Blacksmithing', 'Engineering', 'Herbalism', 'Mining', 'Leatherworking', 'Tailoring', 'Enchanting', 'Alchemy', 'Skinning']
     }
   },
   sockets: {
@@ -128,8 +155,11 @@ export default {
         content.push(`> **${res.data.data.data.username}** teki muutoksia pelaajaan **${copyPlayer.name}**`);
         if (copyPlayer.name !== player.name) content.push(`> Uusi nimi **${player.name}**`);
         if (copyPlayer.dkp !== player.dkp) content.push(`> DKP muutettiin **${player.dkp - copyPlayer.dkp}** (Nyt ${player.dkp})`);
-        if (copyPlayer.race !== player.race) content.push(`> Uusi race **${player.race}**`);
-        if (copyPlayer.class !== player.class) content.push(`> Uusi class **${player.class}**`);
+        if (copyPlayer.race !== player.race) content.push(`> ${copyPlayer.race} -> **${player.race}**`);
+        if (copyPlayer.class !== player.class) content.push(`> ${copyPlayer.class} -> **${player.class}**`);
+        if (copyPlayer.spec !== player.spec) content.push(`> ${copyPlayer.spec} -> **${player.spec}**`);
+        if (copyPlayer.prof1 !== player.prof1) content.push(`> ${copyPlayer.prof1} -> **${player.prof1}**`);
+        if (copyPlayer.prof2 !== player.prof2) content.push(`> ${copyPlayer.prof2} -> **${player.prof2}**`);
         if (player.reason) content.push(`> **Syy:** ${player.reason}`);
         
         const payload = {
@@ -174,6 +204,11 @@ export default {
 
     getClassIcon(val) {
       if (this.classes.includes(val) && val !== 'N/A') return require(`../assets/class_${val.toLowerCase()}.jpg`);
+      else return require('../assets/na.png');
+    },
+
+    getProfessionIcon(val) {
+      if (this.professions.includes(val) && val !== 'N/A') return require(`../assets/profession_${val.toLowerCase()}.png`);
       else return require('../assets/na.png');
     }
   },
