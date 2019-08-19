@@ -180,9 +180,9 @@ export default {
       this.players = res.data.data;
       this.playersCopy = JSON.parse(JSON.stringify(res.data.data));
       this.options = res.data.data.map(player => player.name);
-      this.options.push(...this.races);
-      this.options.push(...this.classes);
-      this.options.push(...this.professions);
+      this.options.push(...this.races.splice(1, 1));
+      this.options.push(...this.classes.splice(1, 1));
+      this.options.push(...this.professions.splice(1, 1));
       this.loading = false;
     });
   },
