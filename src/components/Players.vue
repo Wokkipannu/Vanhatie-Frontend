@@ -76,6 +76,8 @@
     </b-table>
 
     <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" aria-controls="players-table" class="d-flex justify-content-center align-items-center"></b-pagination>
+    <p class="text-center" v-if="!search">{{ filteredPlayers.length }} hakutulosta</p>
+    <p class="text-center" v-if="search">{{ filteredPlayers.length }} hakutulosta hakusanalla {{ search }}</p>
 
     <b-input-group class="w-25" v-if="isLogged">
       <b-form-input type="text" placeholder="Nimi" v-model="newUser"></b-form-input>
@@ -172,9 +174,17 @@ export default {
         this.fields.actions = { label: 'Actions', sortable: false };
         this.$root.$emit('bv::refresh::table', 'players-table');
       }
+    },
+    search(newVal) {
+      if (history.pushState) {
+        let url = `${window.location.protocol}//${window.location.host}${window.location.pathname}?search=${newVal}`;
+        window.history.pushState({ path: url }, '', url);
+      }
     }
   },
   created() {
+    if (this.$route.query.search) this.search = this.$route.query.search;
+
     this.loading = true;
     this.$http.get(`${process.env.VUE_APP_API_ENDPOINT}/api/v1/players`).then(res => {
       this.players = res.data.data;
