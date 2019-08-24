@@ -66,6 +66,10 @@
         <div v-if="!modifying"><b-img :src="getProfessionIcon(player.item.prof2)"/> {{ player.item.prof2 }}</div>
       </template>
 
+      <templte slot="[discord]" slot-scope="player" v-if="modifying">
+        <b-form-input type="text" placeholder="Discord ID" v-model="player.item.discord"></b-form-input>
+      </templte>
+
       <template slot="[actions]" slot-scope="player" v-if="modifying">
         <b-input-group>
           <b-form-input type="text" placeholder="Syy" v-model="player.item.reason"></b-form-input>
@@ -168,10 +172,12 @@ export default {
   watch: {
     modifying(newVal) {
       if (!newVal) {
+        delete this.fields.discord;
         delete this.fields.actions;
         this.$root.$emit('bv::refresh::table', 'players-table');
       }
       else {
+        this.fields.discord = { label: 'Discord ID', sortable: false };
         this.fields.actions = { label: 'Actions', sortable: false };
         this.$root.$emit('bv::refresh::table', 'players-table');
       }
