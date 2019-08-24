@@ -37,8 +37,9 @@
         <b-form-input type="text" placeholder="Pelaajan nimi" v-model="player.item.name"></b-form-input>
       </template>
 
-      <template slot="[dkp]" slot-scope="player" v-if="modifying">
-        <b-form-input type="number" placeholder="DKP" v-model="player.item.dkp"></b-form-input>
+      <template slot="[dkp]" slot-scope="player">
+        <b-form-input type="number" placeholder="DKP" v-model="player.item.dkp" v-if="modifying"></b-form-input>
+        <div v-if="!modifying">{{ numberWithCommas(player.item.dkp) }}</div>
       </template>
 
       <template slot="[race]" slot-scope="player">
@@ -197,6 +198,12 @@ export default {
     });
   },
   methods: {
+    numberWithCommas(x) {
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+    },
+
     update(player) {
       this.loading = true;
 
@@ -206,7 +213,7 @@ export default {
         let content = [];
         content.push(`> **${res.data.data.data.username}** teki muutoksia pelaajaan **${copyPlayer.name}**`);
         if (copyPlayer.name !== player.name) content.push(`> Uusi nimi **${player.name}**`);
-        if (copyPlayer.dkp !== player.dkp) content.push(`> DKP muutettiin **${player.dkp - copyPlayer.dkp}** (Nyt ${player.dkp})`);
+        if (copyPlayer.dkp !== player.dkp) content.push(`> DKP muutettiin **${copyPlayer.dkp} ${player.dkp - copyPlayer.dkp > 0 ? '+' : '-'} ${player.dkp - copyPlayer.dkp}** (Nyt ${player.dkp})`);
         if (copyPlayer.race !== player.race) content.push(`> ${copyPlayer.race} -> **${player.race}**`);
         if (copyPlayer.class !== player.class) content.push(`> ${copyPlayer.class} -> **${player.class}**`);
         if (copyPlayer.spec !== player.spec) content.push(`> ${copyPlayer.spec} -> **${player.spec}**`);
