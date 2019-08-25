@@ -86,6 +86,7 @@
 
     <b-input-group class="w-25" v-if="isLogged">
       <b-form-input type="text" placeholder="Nimi" v-model="newUser"></b-form-input>
+      <b-form-input type="text" placeholder="Discord ID" v-model="newUserDiscordID"></b-form-input>
       <b-input-group-append>
         <b-button variant="success" v-on:click="addPlayer">Lisää</b-button>
       </b-input-group-append>
@@ -146,6 +147,7 @@ export default {
       search: '',
       error: null,
       newUser: '',
+      newUserDiscordID: '',
       races: ['N/A', 'Orc', 'Tauren', 'Troll', 'Undead'],
       classes: ['N/A', 'Druid', 'Hunter', 'Mage', 'Priest', 'Rogue', 'Shaman', 'Warlock', 'Warrior'],
       professions: ['N/A', 'Blacksmithing', 'Engineering', 'Herbalism', 'Mining', 'Leatherworking', 'Tailoring', 'Enchanting', 'Alchemy', 'Skinning'],
@@ -250,7 +252,7 @@ export default {
     addPlayer() {
       if (this.newUser) {
         this.loading = true;
-        this.$http.post(`${process.env.VUE_APP_API_ENDPOINT}/api/v1/players`, { name: this.newUser, dkp: 10, token: localStorage.token }).then(() => {
+        this.$http.post(`${process.env.VUE_APP_API_ENDPOINT}/api/v1/players`, { name: this.newUser, dkp: 10, discord: this.newUserDiscordID, token: localStorage.token }).then(() => {
           this.loading = false;
         })
         .catch(error => {
