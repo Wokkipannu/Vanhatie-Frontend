@@ -66,9 +66,9 @@
         <div v-if="!modifying"><b-img :src="getProfessionIcon(player.item.prof2)"/> {{ player.item.prof2 }}</div>
       </template>
 
-      <templte slot="[discord]" slot-scope="player" v-if="modifying">
+      <template slot="[discord]" slot-scope="player" v-if="modifying">
         <b-form-input type="text" placeholder="Discord ID" v-model="player.item.discord"></b-form-input>
-      </templte>
+      </template>
 
       <template slot="[actions]" slot-scope="player" v-if="modifying">
         <b-input-group>
@@ -77,6 +77,7 @@
             <b-button variant="info" v-on:click="update(player.item)">Tallenna muutokset</b-button>
           </b-input-group-append>
         </b-input-group>
+        <b-button variant="danger" v-on:click="remove(player.item)">Poista</b-button>
       </template>
     </b-table>
 
@@ -206,10 +207,31 @@ export default {
     });
   },
   methods: {
+    async refresh() {
+      this.loading = true;
+      await this.$root.$emit('bv::refresh::table', 'players-table');
+      this.loading = false;
+    },
+
     numberWithCommas(x) {
         var parts = x.toString().split(".");
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return parts.join(".");
+    },
+  
+    remove(player) {
+      if(confirm("Haluatko varmasti poistaa pelaajan?")) {
+        this.error = null;
+        this.$http.delete(`${process.env.VUE_APP_API_ENDPOINT}/api/v1/players/${player._id}?token=${localStorage.token}`).then(async res => {
+          if (res.status === 200) {
+            this.players = this.players.filter(player => player._id === player._id);
+            this.$root.$emit('bv::refresh::table', 'players-table');
+          }
+          else {
+            this.error = 'Pelaajan poistaminen epäonnistui';
+          }
+        });
+      }
     },
 
     update(player) {
