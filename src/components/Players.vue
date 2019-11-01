@@ -135,11 +135,6 @@ export default {
         prof2: {
           label: 'Profession 2',
           sortable: true
-        },
-        dkp: {
-          label: 'DKP',
-          variant: 'light',
-          sortable: true
         }
       },
       players: [],
