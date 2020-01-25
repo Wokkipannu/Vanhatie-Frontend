@@ -2,8 +2,7 @@
   <div>
     <footer class="footer">
       <b-container>
-        <p class="mb-0"><b-icon icon="cone-striped" variant="warning"></b-icon> Vanha tie DKP app by Wokki</p>
-        <p class="mt-0"><a href="https://github.com/Wokkipannu/Vanhatie-Frontend" target="_blank">Github</a></p>
+        <p><b-icon icon="cone-striped" variant="warning"></b-icon> Vanha tie DKP app by Wokki</p>
       </b-container>
     </footer>
   </div>
