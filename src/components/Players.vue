@@ -33,44 +33,44 @@
         <strong class="ml-2">Loading...</strong>
       </div>
 
-      <template slot="[name]" slot-scope="player" v-if="modifying">
+      <template v-slot:cell(name)="player" v-if="modifying">
         <b-form-input type="text" placeholder="Pelaajan nimi" v-model="player.item.name"></b-form-input>
       </template>
 
-      <template slot="[dkp]" slot-scope="player">
+      <template v-slot:cell(dkp)="player">
         <b-form-input type="number" placeholder="DKP" v-model="player.item.dkp" v-if="modifying"></b-form-input>
         <div v-if="!modifying">{{ numberWithCommas(player.item.dkp) }}</div>
       </template>
 
-      <template slot="[race]" slot-scope="player">
+      <template v-slot:cell(race)="player">
         <b-form-select v-model="player.item.race" :options="races" v-if="modifying"></b-form-select>
         <div v-if="!modifying"><b-img :src="getRaceIcon(player.item.race)"/> {{ player.item.race }}</div>
       </template>
 
-      <template slot="[class]" slot-scope="player">
+      <template v-slot:cell(class)="player">
         <b-form-select v-model="player.item.class" :options="classes" v-if="modifying"></b-form-select>
         <div v-if="!modifying"><b-img :src="getClassIcon(player.item.class)"/> {{ player.item.class }}</div>
       </template>
 
-      <template slot="[spec]" slot-scope="player" v-if="modifying">
+      <template v-slot:cell(spec)="player" v-if="modifying">
         <b-form-input type="text" placeholder="Spec" v-model="player.item.spec"></b-form-input>
       </template>
 
-      <template slot="[prof1]" slot-scope="player">
+      <template v-slot:cell(prof1)="player">
         <b-form-select v-model="player.item.prof1" :options="professions" v-if="modifying"></b-form-select>
         <div v-if="!modifying"><b-img :src="getProfessionIcon(player.item.prof1)"/> {{ player.item.prof1 }}</div>
       </template>
 
-      <template slot="[prof2]" slot-scope="player">
+      <template v-slot:cell(prof2)="player">
         <b-form-select v-model="player.item.prof2" :options="professions" v-if="modifying"></b-form-select>
         <div v-if="!modifying"><b-img :src="getProfessionIcon(player.item.prof2)"/> {{ player.item.prof2 }}</div>
       </template>
 
-      <template slot="[discord]" slot-scope="player" v-if="modifying">
+      <template v-slot:cell(discord)="player" v-if="modifying">
         <b-form-input type="text" placeholder="Discord ID" v-model="player.item.discord"></b-form-input>
       </template>
 
-      <template slot="[actions]" slot-scope="player" v-if="modifying">
+      <template v-slot:cell(actions)="player" v-if="modifying">
         <b-input-group>
           <b-form-input type="text" placeholder="Syy" v-model="player.item.reason"></b-form-input>
           <b-input-group-append>
@@ -111,32 +111,43 @@ export default {
   data () {
     return {
       loading: true,
-      fields: {
-        name: {
+      fields: [
+        {
+          key: 'name',
           label: 'Nimi',
           sortable: true
         },
-        race: {
+        {
+          key: 'race',
           label: 'Race',
           sortable: true
         },
-        class: {
+        {
+          key: 'class',
           label: 'Class',
           sortable: true
         },
-        spec: {
+        {
+          key: 'spec',
           label: 'Spec',
           sortable: true
         },
-        prof1: {
+        {
+          key: 'prof1',
           label: 'Profession 1',
           sortable: true
         },
-        prof2: {
+        {
+          key: 'prof2',
           label: 'Profession 2',
           sortable: true
+        },
+        {
+          key: 'dkp',
+          label: 'DKP',
+          sortable: true
         }
-      },
+      ],
       players: [],
       playersCopy: [],
       options: [],
@@ -170,13 +181,12 @@ export default {
   watch: {
     modifying(newVal) {
       if (!newVal) {
-        delete this.fields.discord;
-        delete this.fields.actions;
+        this.fields = this.fields.filter(field => field.key !== 'discord' && field.key !== 'actions');
         this.$root.$emit('bv::refresh::table', 'players-table');
       }
       else {
-        this.fields.discord = { label: 'Discord ID', sortable: false };
-        this.fields.actions = { label: 'Actions', sortable: false };
+        this.fields.push({ key: 'discord', label: 'Discord ID', sortable: false });
+        this.fields.push({ key: 'actions', label: 'Actions', sortable: false });
         this.$root.$emit('bv::refresh::table', 'players-table');
       }
     },
