@@ -145,6 +145,7 @@ export default {
         {
           key: 'dkp',
           label: 'DKP',
+          variant: 'light',
           sortable: true
         }
       ],
