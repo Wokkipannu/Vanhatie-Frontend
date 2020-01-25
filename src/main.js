@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import BootstrapVue from 'bootstrap-vue'
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 import VueSocketIO from 'vue-socket.io'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
@@ -7,7 +7,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-Vue.use(BootstrapVue)
+Vue.use(BootstrapVue);
+Vue.use(BootstrapVueIcons);
 Vue.use(VueAxios, axios);
 Vue.use(new VueSocketIO({
   debug: process.env.VUE_APP_DEBUG,
