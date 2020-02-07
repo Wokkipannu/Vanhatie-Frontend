@@ -2,7 +2,7 @@
   <div>
     <footer class="footer">
       <b-container>
-        <p><b-icon icon="cone-striped" variant="warning"></b-icon> Vanha tie DKP app by Wokki</p>
+        <p><b-icon icon="cone-striped" variant="warning"></b-icon> Vanha tie DKP app by <a href="https://www.wokki.dev/" target="_blank">Wokki</a></p>
       </b-container>
     </footer>
   </div>
